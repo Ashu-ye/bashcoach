@@ -269,9 +269,24 @@ Notes:
 | `findxargs` | Run a command on found files |
 | `jqget` | Extract a value from JSON (needs jq) |
 
-## Running it locally
+## Installation
 
-The extension is not published to the VS Code Marketplace. To try it:
+Install **BashCoach** from the VS Code Marketplace:
+
+1. Open the Extensions panel (`Ctrl+Shift+X`).
+2. Search for `BashCoach` (or `ashray.bashcoach`) and click **Install**.
+
+Or from a terminal:
+
+```bash
+code --install-extension ashray.bashcoach
+```
+
+The extension activates automatically for shell scripts (language mode **Shell Script**, for example `.sh` files).
+
+**Requirements:** VS Code 1.146.0 or newer.
+
+### Build from source
 
 ```bash
 git clone https://github.com/Ashu-ye/bashcoach.git
@@ -282,7 +297,7 @@ npm run compile
 
 Then open the folder in VS Code and press **F5**. A new *Extension Development Host* window opens with the extension loaded. Open or create a `.sh` file to see it in action.
 
-**Requirements:** Node.js and VS Code 1.146.0 or newer.
+Building needs Node.js.
 
 **Windows note:** if PowerShell blocks `npm`, run
 `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
