@@ -1,8 +1,8 @@
 {
   "name": "bashcoach",
 "displayName": "BashCoach",
-"description": "Coaches you to write safer bash scripts: security linting, explanations and snippets",
-  "version": "0.1.0",
+"description": "Coaches you to write safer bash scripts: security linting with explanations, quick fixes and a 126-snippet library",
+"version": "0.1.0",
 "publisher": "your-publisher-id",
 "license": "MIT",
 "icon": "icon.png",
