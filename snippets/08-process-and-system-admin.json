@@ -1,0 +1,104 @@
+{
+  "Require root": {
+    "prefix": "ifroot",
+    "body": [
+      "if [[ \\$EUID -ne 0 ]]; then",
+      "\techo \"This script must be run as root\" >&2",
+      "\texit 1",
+      "fi"
+    ],
+    "description": "Require root"
+  },
+  "Check a systemd service": {
+    "prefix": "ifservice",
+    "body": [
+      "if systemctl is-active --quiet ${1:service}; then",
+      "\t${2:echo \"Service is running\"}",
+      "else",
+      "\t${3:echo \"Service is not running\"}",
+      "fi"
+    ],
+    "description": "Check a systemd service"
+  },
+  "Check that a user exists": {
+    "prefix": "ifuser",
+    "body": [
+      "if id \"${1:username}\" >/dev/null 2>&1; then",
+      "\t${2:echo \"User exists\"}",
+      "else",
+      "\t${3:echo \"User not found\"}",
+      "fi"
+    ],
+    "description": "Check that a user exists"
+  },
+  "Find processes by name": {
+    "prefix": "pgrep",
+    "body": [
+      "pgrep -af \"${1:name}\""
+    ],
+    "description": "Find processes by name"
+  },
+  "Run a command in the background and wait": {
+    "prefix": "background",
+    "body": [
+      "${1:command} &",
+      "${2:pid}=\\$!",
+      "wait \"\\$${2}\"",
+      "echo \"Exit status: \\$?\""
+    ],
+    "description": "Run a command in the background and wait"
+  },
+  "Run jobs in parallel": {
+    "prefix": "parallel",
+    "body": [
+      "for ${1:item} in ${2:a b c}; do",
+      "\t${3:commands} &",
+      "done",
+      "wait"
+    ],
+    "description": "Run jobs in parallel"
+  },
+  "Allow only one running instance": {
+    "prefix": "singleinstance",
+    "body": [
+      "exec 200>\"\\${TMPDIR:-/tmp\\}/${1:myscript}.lock\"",
+      "flock -n 200 || { echo \"Another instance is already running\" >&2; exit 1; \\}"
+    ],
+    "description": "Allow only one running instance"
+  },
+  "Print host, user and date": {
+    "prefix": "sysinfo",
+    "body": [
+      "echo \"Host: \\$(hostname) | User: \\$(whoami) | Date: \\$(date)\""
+    ],
+    "description": "Print host, user and date"
+  },
+  "Run a command with a timeout": {
+    "prefix": "timeoutcmd",
+    "body": [
+      "timeout ${1:10}s ${2:command}"
+    ],
+    "description": "Run a command with a timeout"
+  },
+  "Repeat a command every few seconds": {
+    "prefix": "watchloop",
+    "body": [
+      "while true; do",
+      "\tclear",
+      "\t${1:command}",
+      "\tsleep ${2:2}",
+      "done"
+    ],
+    "description": "Repeat a command every few seconds"
+  },
+  "Warn when disk usage is high": {
+    "prefix": "diskalert",
+    "body": [
+      "used=\"\\$(df -P \"${1:/}\" | awk 'NR==2 {gsub(\"%\", \"\", \\$5); print \\$5\\}')\"",
+      "if (( used > ${2:90} )); then",
+      "\techo \"Disk usage is \\${used\\}%\" >&2",
+      "fi"
+    ],
+    "description": "Warn when disk usage is high"
+  }
+}

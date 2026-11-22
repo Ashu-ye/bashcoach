@@ -23,7 +23,7 @@ const rules: Rule[] = [
     title: 'eval can execute attacker-controlled input (command injection).',
     why: 'eval treats text as code, so any untrusted value that reaches it can run arbitrary commands.',
     fix: 'Avoid eval. Use arrays for command arguments, case statements, or indirect expansion like ${!name}.',
-    pattern: /\beval\b/,
+    pattern: /(?<=(?:^|[;&|({]|\b(?:then|do|else|elif|if|while|until)\b)\s*)eval\b/,
     severity: vscode.DiagnosticSeverity.Warning,
   },
   {
@@ -31,7 +31,7 @@ const rules: Rule[] = [
     title: 'Possible hardcoded credential.',
     why: 'Secrets written in a script end up in version control, backups and shell history.',
     fix: 'Read secrets from environment variables, a secrets manager, or a protected file kept outside the repository.',
-    pattern: /\b(password|passwd|secret|api_?key|token)\s*=\s*["']?[^\s"']+/i,
+    pattern: /\b\w*(password|passwd|secret|api_?key|token)\w*\s*=(?![=~])\s*["']?(?![$`])[^\s"']+/i,
     severity: vscode.DiagnosticSeverity.Warning,
   },
   {
@@ -143,23 +143,87 @@ const rules: Rule[] = [
     title: 'Script uses sudo.',
     why: 'Elevated commands raise the impact of any bug or injected input in the script.',
     fix: 'Check that each sudo call is needed, and elevate only the specific commands that require it.',
-    pattern: /\bsudo\b/,
+    pattern: /(?<=(?:^|[;&|({]|\b(?:then|do|else|elif|if|while|until)\b)\s*)sudo\b/,
     severity: vscode.DiagnosticSeverity.Information,
   },
 ];
+
+const MIN_LEVEL: Record<string, number> = { Information: 1, Warning: 2, Error: 3 };
+
+type IgnoreList = string[] | 'all' | null;
+
+// Matches: # bashcoach-disable-next-line BC004, BC005   or   # bashcoach-disable-line
+const DIRECTIVE = /#\s*bashcoach-disable-(next-line|line)\b(.*)$/;
+
+function severityLevel(s: vscode.DiagnosticSeverity): number {
+  switch (s) {
+    case vscode.DiagnosticSeverity.Error:
+      return 3;
+    case vscode.DiagnosticSeverity.Warning:
+      return 2;
+    case vscode.DiagnosticSeverity.Information:
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+// No IDs listed after the directive means "ignore every rule".
+function parseIds(rest: string): IgnoreList {
+  const ids = rest.match(/BC\d{3}/gi);
+  return ids ? ids.map((i) => i.toUpperCase()) : 'all';
+}
+
+function isIgnored(list: IgnoreList, id: string): boolean {
+  return list === 'all' || (list !== null && list.includes(id));
+}
 
 function scan(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
   if (doc.languageId !== 'shellscript') {
     return;
   }
+
+  const config = vscode.workspace.getConfiguration('bashcoach', doc.uri);
+  const disabled = new Set(
+    config.get<string[]>('disabledRules', []).map((s) => s.toUpperCase())
+  );
+  const minLevel = MIN_LEVEL[config.get<string>('minimumSeverity', 'Information')] ?? 1;
+
   const diagnostics: vscode.Diagnostic[] = [];
+  let nextLineIgnore: IgnoreList = null;
 
   for (let i = 0; i < doc.lineCount; i++) {
     const text = doc.lineAt(i).text;
+
+    // Ignore rules set by the previous line apply to this line only.
+    const ignoreFromPrevious = nextLineIgnore;
+    nextLineIgnore = null;
+
+    let ignoreOnThisLine: IgnoreList = null;
+    const directive = DIRECTIVE.exec(text);
+    if (directive) {
+      const ids = parseIds(directive[2]);
+      if (directive[1] === 'next-line') {
+        nextLineIgnore = ids;
+      } else {
+        ignoreOnThisLine = ids;
+      }
+    }
+
     if (text.trim().startsWith('#')) {
       continue; // skip comments
     }
+
     for (const rule of rules) {
+      if (disabled.has(rule.id)) {
+        continue;
+      }
+      if (severityLevel(rule.severity) < minLevel) {
+        continue;
+      }
+      if (isIgnored(ignoreFromPrevious, rule.id) || isIgnored(ignoreOnThisLine, rule.id)) {
+        continue;
+      }
       const match = rule.pattern.exec(text);
       if (match) {
         const range = new vscode.Range(i, match.index, i, match.index + match[0].length);
@@ -174,16 +238,86 @@ function scan(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection)
   collection.set(doc.uri, diagnostics);
 }
 
+function autoFix(id: string, text: string): { title: string; text: string } | undefined {
+  switch (id) {
+    case 'BC004':
+      return { title: 'Quote the variable', text: text.replace(/(\$\{?\w+\}?)(\s?)$/, '"$1"$2') };
+    case 'BC005':
+      return { title: 'Change 777 to 755', text: text.replace(/0?777$/, '755') };
+    case 'BC010':
+      return { title: 'Use https:// instead of http://', text: text.replace(/http:\/\/$/, 'https://') };
+    default:
+      return undefined;
+  }
+}
+
+class BashCoachActions implements vscode.CodeActionProvider {
+  static readonly providedCodeActionKinds = [vscode.CodeActionKind.QuickFix];
+
+  provideCodeActions(
+    doc: vscode.TextDocument,
+    _range: vscode.Range,
+    context: vscode.CodeActionContext
+  ): vscode.CodeAction[] {
+    const actions: vscode.CodeAction[] = [];
+
+    for (const diag of context.diagnostics) {
+      if (diag.source !== 'BashCoach' || typeof diag.code !== 'string') {
+        continue;
+      }
+
+      // 1. Automatic fix, for the rules that have one
+      const original = doc.getText(diag.range);
+      const fix = autoFix(diag.code, original);
+      if (fix && fix.text !== original) {
+        const action = new vscode.CodeAction(fix.title, vscode.CodeActionKind.QuickFix);
+        action.edit = new vscode.WorkspaceEdit();
+        action.edit.replace(doc.uri, diag.range, fix.text);
+        action.diagnostics = [diag];
+        action.isPreferred = true;
+        actions.push(action);
+      }
+
+      // 2. Ignore this rule on this line (works for every rule)
+      const line = doc.lineAt(diag.range.start.line);
+      const indent = line.text.match(/^\s*/)?.[0] ?? '';
+      const ignore = new vscode.CodeAction(
+        `Ignore ${diag.code} on this line`,
+        vscode.CodeActionKind.QuickFix
+      );
+      ignore.edit = new vscode.WorkspaceEdit();
+      ignore.edit.insert(
+        doc.uri,
+        new vscode.Position(line.lineNumber, 0),
+        `${indent}# bashcoach-disable-next-line ${diag.code}\n`
+      );
+      ignore.diagnostics = [diag];
+      actions.push(ignore);
+    }
+    return actions;
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
   const collection = vscode.languages.createDiagnosticCollection('bashcoach');
   context.subscriptions.push(collection);
 
+    context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider('shellscript', new BashCoachActions(), {
+      providedCodeActionKinds: BashCoachActions.providedCodeActionKinds,
+    })
+  );
   vscode.workspace.textDocuments.forEach((d) => scan(d, collection));
 
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument((d) => scan(d, collection)),
     vscode.workspace.onDidChangeTextDocument((e) => scan(e.document, collection)),
-    vscode.workspace.onDidCloseTextDocument((d) => collection.delete(d.uri))
+    vscode.workspace.onDidCloseTextDocument((d) => collection.delete(d.uri)),
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('bashcoach')) {
+        vscode.workspace.textDocuments.forEach((d) => scan(d, collection));
+      }
+    })
   );
 }
 

@@ -2,22 +2,48 @@
   "name": "bashcoach",
 "displayName": "BashCoach",
 "description": "Coaches you to write safer bash scripts: security linting, explanations and snippets",
-  "version": "0.0.1",
-  "engines": {
-    "vscode": "^1.146.0"
-  },
-  "categories": [
-    "Other"
-  ],
+  "version": "0.1.0",
+"publisher": "your-publisher-id",
+"license": "MIT",
+"icon": "icon.png",
+"repository": { "type": "git", "url": "https://github.com/Ashu-ye/bashcoach.git" },
+"bugs": { "url": "https://github.com/Ashu-ye/bashcoach/issues" },
+"homepage": "https://github.com/Ashu-ye/bashcoach#readme",
+"categories": ["Linters", "Snippets"],
+"keywords": ["bash", "shell", "security", "linter", "snippets"],
+
   "activationEvents": ["onLanguage:shellscript"],
   "main": "./out/extension.js",
   "contributes": {
   "snippets": [
-    {
-      "language": "shellscript",
-      "path": "./snippets/bash.json"
+  { "language": "shellscript", "path": "./snippets/01-variables-and-input.json" },
+  { "language": "shellscript", "path": "./snippets/02-conditions-and-comparisons.json" },
+  { "language": "shellscript", "path": "./snippets/03-loops-and-flow-control.json" },
+  { "language": "shellscript", "path": "./snippets/04-functions.json" },
+  { "language": "shellscript", "path": "./snippets/05-file-and-directory-operations.json" },
+  { "language": "shellscript", "path": "./snippets/06-string-and-array-operations.json" },
+  { "language": "shellscript", "path": "./snippets/07-error-handling-and-debugging.json" },
+  { "language": "shellscript", "path": "./snippets/08-process-and-system-admin.json" },
+  { "language": "shellscript", "path": "./snippets/09-networking-and-security.json" },
+  { "language": "shellscript", "path": "./snippets/10-bash-one-liners.json" }
+],
+  "configuration": {
+    "title": "BashCoach",
+    "properties": {
+      "bashcoach.disabledRules": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": [],
+        "description": "Rule IDs to turn off, for example BC016 and BC017."
+      },
+      "bashcoach.minimumSeverity": {
+        "type": "string",
+        "enum": ["Information", "Warning", "Error"],
+        "default": "Information",
+        "description": "Only show findings at or above this severity."
+      }
     }
-  ]
+  }
 },
   "scripts": {
     "vscode:prepublish": "npm run compile",

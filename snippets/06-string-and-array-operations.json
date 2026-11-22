@@ -1,0 +1,104 @@
+{
+  "Create an array": {
+    "prefix": "array",
+    "body": [
+      "${1:items}=(${2:\"one\" \"two\" \"three\"})"
+    ],
+    "description": "Create an array"
+  },
+  "Append to an array": {
+    "prefix": "arrayadd",
+    "body": [
+      "${1:items}+=(\"${2:value}\")"
+    ],
+    "description": "Append to an array"
+  },
+  "Array length": {
+    "prefix": "arraylen",
+    "body": [
+      "${1:count}=\\${#${2:items}[@]\\}"
+    ],
+    "description": "Array length"
+  },
+  "Associative array with loop (Bash 4+)": {
+    "prefix": "assoc",
+    "body": [
+      "declare -A ${1:map}",
+      "${1}[${2:key}]=\"${3:value}\"",
+      "for ${4:k} in \"\\${!${1}[@]\\}\"; do",
+      "\techo \"\\$${4} = \\${${1}[\\$${4}]\\}\"",
+      "done"
+    ],
+    "description": "Associative array with loop (Bash 4+)"
+  },
+  "String length": {
+    "prefix": "strlen",
+    "body": [
+      "${1:length}=\\${#${2:text}\\}"
+    ],
+    "description": "String length"
+  },
+  "Substring": {
+    "prefix": "substr",
+    "body": [
+      "${1:part}=\"\\${${2:text}:${3:0}:${4:5}\\}\""
+    ],
+    "description": "Substring"
+  },
+  "Replace text in a string": {
+    "prefix": "replace",
+    "body": [
+      "${1:result}=\"\\${${2:text}//${3:old}/${4:new}\\}\""
+    ],
+    "description": "Replace text in a string"
+  },
+  "Remove a prefix": {
+    "prefix": "stripprefix",
+    "body": [
+      "${1:result}=\"\\${${2:text}#${3:prefix}\\}\""
+    ],
+    "description": "Remove a prefix"
+  },
+  "Remove a suffix": {
+    "prefix": "stripsuffix",
+    "body": [
+      "${1:result}=\"\\${${2:text}%${3:suffix}\\}\""
+    ],
+    "description": "Remove a suffix"
+  },
+  "Uppercase a string (Bash 4+)": {
+    "prefix": "upper",
+    "body": [
+      "${1:result}=\"\\${${2:text}^^\\}\""
+    ],
+    "description": "Uppercase a string (Bash 4+)"
+  },
+  "Lowercase a string (Bash 4+)": {
+    "prefix": "lower",
+    "body": [
+      "${1:result}=\"\\${${2:text},,\\}\""
+    ],
+    "description": "Lowercase a string (Bash 4+)"
+  },
+  "Split a string into an array": {
+    "prefix": "splitstr",
+    "body": [
+      "IFS='${1:,}' read -r -a ${2:parts} <<< \"\\$${3:text}\""
+    ],
+    "description": "Split a string into an array"
+  },
+  "Join an array into a string": {
+    "prefix": "joinarr",
+    "body": [
+      "${1:joined}=\"\\$(IFS='${2:,}'; echo \"\\${${3:items}[*]\\}\")\""
+    ],
+    "description": "Join an array into a string"
+  },
+  "Read lines into an array (Bash 4+)": {
+    "prefix": "mapfile",
+    "body": [
+      "mapfile -t ${1:lines} < \"${2:file}\""
+    ],
+    "description": "Read lines into an array (Bash 4+)"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "if block": {
+    "prefix": "if",
+    "body": [
+      "if [[ ${1:condition} ]]; then",
+      "\t${2:commands}",
+      "fi"
+    ],
+    "description": "if block"
+  },
+  "if / else block": {
+    "prefix": "ifelse",
+    "body": [
+      "if [[ ${1:condition} ]]; then",
+      "\t${2:commands}",
+      "else",
+      "\t${3:commands}",
+      "fi"
+    ],
+    "description": "if / else block"
+  },
+  "if / elif / else block": {
+    "prefix": "ifelif",
+    "body": [
+      "if [[ ${1:condition} ]]; then",
+      "\t${2:commands}",
+      "elif [[ ${3:condition} ]]; then",
+      "\t${4:commands}",
+      "else",
+      "\t${5:commands}",
+      "fi"
+    ],
+    "description": "if / elif / else block"
+  },
+  "case statement": {
+    "prefix": "case",
+    "body": [
+      "case \"\\$${1:var}\" in",
+      "\t${2:pattern})",
+      "\t\t${3:commands}",
+      "\t\t;;",
+      "\t*)",
+      "\t\t${4:commands}",
+      "\t\t;;",
+      "esac"
+    ],
+    "description": "case statement"
+  },
+  "Compare strings": {
+    "prefix": "ifstr",
+    "body": [
+      "if [[ \"\\$${1:var}\" == \"${2:value}\" ]]; then",
+      "\t${3:commands}",
+      "fi"
+    ],
+    "description": "Compare strings"
+  },
+  "Compare numbers": {
+    "prefix": "ifnum",
+    "body": [
+      "if (( ${1:count} ${2:>} ${3:0} )); then",
+      "\t${4:commands}",
+      "fi"
+    ],
+    "description": "Compare numbers"
+  },
+  "Check that a file exists": {
+    "prefix": "iffile",
+    "body": [
+      "if [[ -f \"${1:file}\" ]]; then",
+      "\t${2:commands}",
+      "fi"
+    ],
+    "description": "Check that a file exists"
+  },
+  "Check that a directory exists": {
+    "prefix": "ifdir",
+    "body": [
+      "if [[ -d \"${1:dir}\" ]]; then",
+      "\t${2:commands}",
+      "fi"
+    ],
+    "description": "Check that a directory exists"
+  },
+  "Check for an empty variable": {
+    "prefix": "ifempty",
+    "body": [
+      "if [[ -z \"\\$${1:var}\" ]]; then",
+      "\t${2:commands}",
+      "fi"
+    ],
+    "description": "Check for an empty variable"
+  },
+  "Check that a command is installed": {
+    "prefix": "ifcmd",
+    "body": [
+      "if command -v ${1:tool} >/dev/null 2>&1; then",
+      "\t${2:commands}",
+      "else",
+      "\techo \"${1} is not installed\" >&2",
+      "fi"
+    ],
+    "description": "Check that a command is installed"
+  },
+  "Match a regular expression": {
+    "prefix": "ifregex",
+    "body": [
+      "if [[ \"\\$${1:var}\" =~ ${2:^[0-9]+\\$} ]]; then",
+      "\t${3:commands}",
+      "fi"
+    ],
+    "description": "Match a regular expression"
+  }
+}

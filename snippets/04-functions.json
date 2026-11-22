@@ -1,0 +1,87 @@
+{
+  "Function definition": {
+    "prefix": "function",
+    "body": [
+      "${1:name}() {",
+      "\t${2:commands}",
+      "\\}"
+    ],
+    "description": "Function definition"
+  },
+  "Function with local variables and defaults": {
+    "prefix": "funcargs",
+    "body": [
+      "${1:name}() {",
+      "\tlocal ${2:first}=\"\\$1\"",
+      "\tlocal ${3:second}=\"\\${2:-${4:default}\\}\"",
+      "\t${5:commands}",
+      "\treturn 0",
+      "\\}"
+    ],
+    "description": "Function with local variables and defaults"
+  },
+  "Function that returns a value": {
+    "prefix": "funcreturn",
+    "body": [
+      "${1:get_value}() {",
+      "\tlocal result=\"${2:value}\"",
+      "\techo \"\\$result\"",
+      "\\}",
+      "",
+      "${3:value}=\"\\$(${1})\""
+    ],
+    "description": "Function that returns a value"
+  },
+  "main function and entry point": {
+    "prefix": "main",
+    "body": [
+      "main() {",
+      "\t${1:commands}",
+      "\\}",
+      "",
+      "main \"\\$@\""
+    ],
+    "description": "main function and entry point"
+  },
+  "Run only when executed, not sourced": {
+    "prefix": "ifmain",
+    "body": [
+      "if [[ \"\\${BASH_SOURCE[0]\\}\" == \"\\$0\" ]]; then",
+      "\tmain \"\\$@\"",
+      "fi"
+    ],
+    "description": "Run only when executed, not sourced"
+  },
+  "usage() help function": {
+    "prefix": "usagefn",
+    "body": [
+      "usage() {",
+      "\techo \"Usage: \\$(basename \"\\$0\") [options] ${1:<arguments>}\"",
+      "\techo",
+      "\techo \"Options:\"",
+      "\techo \"  -h    Show this help\"",
+      "\\}"
+    ],
+    "description": "usage() help function"
+  },
+  "Local variable": {
+    "prefix": "localvar",
+    "body": [
+      "local ${1:name}=\"${2:value}\""
+    ],
+    "description": "Local variable"
+  },
+  "Source a file safely": {
+    "prefix": "sourcefile",
+    "body": [
+      "if [[ -f \"${1:lib.sh}\" ]]; then",
+      "\t# shellcheck source=/dev/null",
+      "\tsource \"${1}\"",
+      "else",
+      "\techo \"Cannot find ${1}\" >&2",
+      "\texit 1",
+      "fi"
+    ],
+    "description": "Source a file safely"
+  }
+}

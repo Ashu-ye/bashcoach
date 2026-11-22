@@ -1,0 +1,120 @@
+{
+  "for ... in loop": {
+    "prefix": "for",
+    "body": [
+      "for ${1:item} in ${2:list}; do",
+      "\t${3:commands}",
+      "done"
+    ],
+    "description": "for ... in loop"
+  },
+  "C-style for loop": {
+    "prefix": "forc",
+    "body": [
+      "for ((${1:i}=0; ${1}<${2:10}; ${1}++)); do",
+      "\t${3:commands}",
+      "done"
+    ],
+    "description": "C-style for loop"
+  },
+  "while loop": {
+    "prefix": "while",
+    "body": [
+      "while [[ ${1:condition} ]]; do",
+      "\t${2:commands}",
+      "done"
+    ],
+    "description": "while loop"
+  },
+  "Read a file line by line": {
+    "prefix": "whileread",
+    "body": [
+      "while IFS= read -r line; do",
+      "\t${2:echo \"\\$line\"}",
+      "done < \"${1:file}\""
+    ],
+    "description": "Read a file line by line"
+  },
+  "Read command output line by line": {
+    "prefix": "whilecmd",
+    "body": [
+      "while IFS= read -r line; do",
+      "\t${2:echo \"\\$line\"}",
+      "done < <(${1:command})"
+    ],
+    "description": "Read command output line by line"
+  },
+  "Loop over files with a glob": {
+    "prefix": "forfiles",
+    "body": [
+      "for ${1:file} in ${2:*.txt}; do",
+      "\t[[ -e \"\\$${1}\" ]] || continue",
+      "\t${3:commands}",
+      "done"
+    ],
+    "description": "Loop over files with a glob"
+  },
+  "Loop over an array": {
+    "prefix": "forarray",
+    "body": [
+      "for ${1:item} in \"\\${${2:array}[@]\\}\"; do",
+      "\t${3:commands}",
+      "done"
+    ],
+    "description": "Loop over an array"
+  },
+  "Loop over script arguments": {
+    "prefix": "forargs",
+    "body": [
+      "for ${1:arg} in \"\\$@\"; do",
+      "\t${2:commands}",
+      "done"
+    ],
+    "description": "Loop over script arguments"
+  },
+  "Loop over a numeric range": {
+    "prefix": "forrange",
+    "body": [
+      "for ${1:i} in {${2:1}..${3:10}\\}; do",
+      "\t${4:commands}",
+      "done"
+    ],
+    "description": "Loop over a numeric range"
+  },
+  "Infinite loop with sleep": {
+    "prefix": "whiletrue",
+    "body": [
+      "while true; do",
+      "\t${1:commands}",
+      "\tsleep ${2:1}",
+      "done"
+    ],
+    "description": "Infinite loop with sleep"
+  },
+  "until loop": {
+    "prefix": "until",
+    "body": [
+      "until ${1:condition}; do",
+      "\t${2:commands}",
+      "done"
+    ],
+    "description": "until loop"
+  },
+  "Retry a command with a limit": {
+    "prefix": "retry",
+    "body": [
+      "max_attempts=${1:3}",
+      "attempt=1",
+      "until ${2:command}; do",
+      "\tif (( attempt >= max_attempts )); then",
+      "\t\techo \"Failed after \\$max_attempts attempts\" >&2",
+      "\t\texit 1",
+      "\tfi",
+      "\techo \"Attempt \\$attempt failed, retrying...\" >&2",
+      "\tattempt=\\$((attempt + 1))",
+      "\tsleep ${3:2}",
+      "done"
+    ],
+    "description": "Retry a command with a limit"
+  }
+}

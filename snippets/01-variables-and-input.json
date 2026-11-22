@@ -1,0 +1,122 @@
+{
+  "Read input with a prompt": {
+    "prefix": "readp",
+    "body": [
+      "read -r -p \"${1:Enter value: }\" ${2:name}"
+    ],
+    "description": "Read input with a prompt"
+  },
+  "Read hidden input (passwords)": {
+    "prefix": "reads",
+    "body": [
+      "read -r -s -p \"${1:Password: }\" ${2:secret}",
+      "echo"
+    ],
+    "description": "Read hidden input (passwords)"
+  },
+  "Yes/no confirmation prompt": {
+    "prefix": "confirm",
+    "body": [
+      "read -r -p \"${1:Are you sure?} [y/N] \" ${2:reply}",
+      "if [[ \"\\$${2}\" =~ ^[Yy]\\$ ]]; then",
+      "\t${3:echo \"Confirmed\"}",
+      "else",
+      "\t${4:echo \"Cancelled\"}",
+      "fi"
+    ],
+    "description": "Yes/no confirmation prompt"
+  },
+  "Interactive select menu": {
+    "prefix": "selectmenu",
+    "body": [
+      "PS3=\"${1:Choose an option: }\"",
+      "select ${2:choice} in ${3:one two three}; do",
+      "\tcase \"\\$${2}\" in",
+      "\t\t${4:one})",
+      "\t\t\t${5:echo \"You chose one\"}",
+      "\t\t\t;;",
+      "\t\t*)",
+      "\t\t\techo \"Invalid choice\" >&2",
+      "\t\t\t;;",
+      "\tesac",
+      "\tbreak",
+      "done"
+    ],
+    "description": "Interactive select menu"
+  },
+  "Check the number of arguments": {
+    "prefix": "argcheck",
+    "body": [
+      "if [[ \\$# -lt ${1:1} ]]; then",
+      "\techo \"Usage: \\$0 ${2:<argument>}\" >&2",
+      "\texit 1",
+      "fi"
+    ],
+    "description": "Check the number of arguments"
+  },
+  "Parse command-line options with getopts": {
+    "prefix": "getopts",
+    "body": [
+      "while getopts \":${1:ab:h}\" opt; do",
+      "\tcase \"\\$opt\" in",
+      "\t\ta) ${2:echo \"Option -a\"} ;;",
+      "\t\tb) ${3:echo \"Option -b = \\$OPTARG\"} ;;",
+      "\t\th) ${4:echo \"Usage: \\$0 [-a] [-b value]\"; exit 0} ;;",
+      "\t\t\\\\?) echo \"Invalid option: -\\$OPTARG\" >&2; exit 1 ;;",
+      "\t\t:) echo \"Option -\\$OPTARG requires an argument\" >&2; exit 1 ;;",
+      "\tesac",
+      "done",
+      "shift \\$((OPTIND - 1))"
+    ],
+    "description": "Parse command-line options with getopts"
+  },
+  "Set a default value if a variable is unset": {
+    "prefix": "defvar",
+    "body": [
+      ": \"\\${${1:VAR}:=${2:default}\\}\""
+    ],
+    "description": "Set a default value if a variable is unset"
+  },
+  "Exit if a variable is unset or empty": {
+    "prefix": "reqvar",
+    "body": [
+      ": \"\\${${1:VAR}:?${1} is required\\}\""
+    ],
+    "description": "Exit if a variable is unset or empty"
+  },
+  "Variable assignment": {
+    "prefix": "var",
+    "body": [
+      "${1:name}=\"${2:value}\""
+    ],
+    "description": "Variable assignment"
+  },
+  "Capture command output in a variable": {
+    "prefix": "cmdsub",
+    "body": [
+      "${1:result}=\"\\$(${2:command})\""
+    ],
+    "description": "Capture command output in a variable"
+  },
+  "Read-only variable": {
+    "prefix": "constant",
+    "body": [
+      "readonly ${1:NAME}=\"${2:value}\""
+    ],
+    "description": "Read-only variable"
+  },
+  "Export an environment variable": {
+    "prefix": "exportvar",
+    "body": [
+      "export ${1:NAME}=\"${2:value}\""
+    ],
+    "description": "Export an environment variable"
+  },
+  "Arithmetic expression": {
+    "prefix": "arith",
+    "body": [
+      "${1:result}=\\$(( ${2:a} + ${3:b} ))"
+    ],
+    "description": "Arithmetic expression"
+  }
+}

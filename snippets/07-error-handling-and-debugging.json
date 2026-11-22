@@ -1,0 +1,120 @@
+{
+  "Script header with set -euo pipefail": {
+    "prefix": "bashhead",
+    "body": [
+      "#!/usr/bin/env bash",
+      "set -euo pipefail",
+      "",
+      "$0"
+    ],
+    "description": "Script header with set -euo pipefail"
+  },
+  "Strict mode with safer IFS": {
+    "prefix": "strict",
+    "body": [
+      "set -euo pipefail",
+      "IFS=\\$'\\\\n\\\\t'"
+    ],
+    "description": "Strict mode with safer IFS"
+  },
+  "Cleanup function run on exit": {
+    "prefix": "trapexit",
+    "body": [
+      "cleanup() {",
+      "\t${1:echo \"Cleaning up...\"}",
+      "\\}",
+      "trap cleanup EXIT"
+    ],
+    "description": "Cleanup function run on exit"
+  },
+  "Handle Ctrl+C and termination": {
+    "prefix": "trapint",
+    "body": [
+      "trap 'echo \"Interrupted\" >&2; exit 130' INT TERM"
+    ],
+    "description": "Handle Ctrl+C and termination"
+  },
+  "Report the line of a failing command": {
+    "prefix": "traperr",
+    "body": [
+      "trap 'echo \"Error on line \\$LINENO: \\$BASH_COMMAND\" >&2' ERR"
+    ],
+    "description": "Report the line of a failing command"
+  },
+  "die() error helper": {
+    "prefix": "die",
+    "body": [
+      "die() {",
+      "\techo \"Error: \\$*\" >&2",
+      "\texit 1",
+      "\\}"
+    ],
+    "description": "die() error helper"
+  },
+  "Timestamped log() function": {
+    "prefix": "logfn",
+    "body": [
+      "log() {",
+      "\tprintf '[%s] %s\\\\n' \"\\$(date +'%Y-%m-%d %H:%M:%S')\" \"\\$*\" >&2",
+      "\\}"
+    ],
+    "description": "Timestamped log() function"
+  },
+  "Run a command or exit with a message": {
+    "prefix": "orexit",
+    "body": [
+      "${1:command} || { echo \"${2:Command failed}\" >&2; exit 1; \\}"
+    ],
+    "description": "Run a command or exit with a message"
+  },
+  "Exit if a command fails": {
+    "prefix": "iffail",
+    "body": [
+      "if ! ${1:command}; then",
+      "\techo \"${2:Command failed}\" >&2",
+      "\texit 1",
+      "fi"
+    ],
+    "description": "Exit if a command fails"
+  },
+  "Check required commands": {
+    "prefix": "needcmd",
+    "body": [
+      "for cmd in ${1:curl jq}; do",
+      "\tcommand -v \"\\$cmd\" >/dev/null 2>&1 || { echo \"Missing required command: \\$cmd\" >&2; exit 1; \\}",
+      "done"
+    ],
+    "description": "Check required commands"
+  },
+  "Print a variable for debugging": {
+    "prefix": "debugvar",
+    "body": [
+      "echo \"DEBUG: ${1:var}=\\$${1}\" >&2"
+    ],
+    "description": "Print a variable for debugging"
+  },
+  "Trace a block with set -x": {
+    "prefix": "debugblock",
+    "body": [
+      "set -x",
+      "${1:commands}",
+      "set +x"
+    ],
+    "description": "Trace a block with set -x"
+  },
+  "Trace with file and line numbers": {
+    "prefix": "ps4",
+    "body": [
+      "export PS4='+ \\${BASH_SOURCE\\}:\\${LINENO\\}: '",
+      "set -x"
+    ],
+    "description": "Trace with file and line numbers"
+  },
+  "Disable a ShellCheck rule": {
+    "prefix": "shellcheck",
+    "body": [
+      "# shellcheck disable=${1:SC2086}"
+    ],
+    "description": "Disable a ShellCheck rule"
+  }
+}

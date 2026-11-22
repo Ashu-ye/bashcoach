@@ -1,0 +1,121 @@
+{
+  "Count lines in a file": {
+    "prefix": "countlines",
+    "body": [
+      "wc -l < \"${1:file}\""
+    ],
+    "description": "Count lines in a file"
+  },
+  "Largest files and directories": {
+    "prefix": "largestfiles",
+    "body": [
+      "du -ah ${1:.} | sort -rh | head -n ${2:10}"
+    ],
+    "description": "Largest files and directories"
+  },
+  "Find large files": {
+    "prefix": "findlarge",
+    "body": [
+      "find ${1:.} -type f -size +${2:100M} -exec ls -lh {\\} +"
+    ],
+    "description": "Find large files"
+  },
+  "Find old files": {
+    "prefix": "findold",
+    "body": [
+      "find \"${1:.}\" -type f -mtime +${2:30} -print"
+    ],
+    "description": "Find old files"
+  },
+  "Most used shell commands": {
+    "prefix": "topcommands",
+    "body": [
+      "history | awk '{print \\$2\\}' | sort | uniq -c | sort -rn | head -n ${1:10}"
+    ],
+    "description": "Most used shell commands"
+  },
+  "Count duplicate lines": {
+    "prefix": "countunique",
+    "body": [
+      "sort \"${1:file}\" | uniq -c | sort -rn"
+    ],
+    "description": "Count duplicate lines"
+  },
+  "Print a column with awk": {
+    "prefix": "awkcol",
+    "body": [
+      "awk '{print \\$${1:1}\\}' \"${2:file}\""
+    ],
+    "description": "Print a column with awk"
+  },
+  "Replace text in a file (keeps a .bak backup)": {
+    "prefix": "sedreplace",
+    "body": [
+      "sed -i.bak 's/${1:old}/${2:new}/g' \"${3:file}\""
+    ],
+    "description": "Replace text in a file (keeps a .bak backup)"
+  },
+  "Search recursively with line numbers": {
+    "prefix": "grepr",
+    "body": [
+      "grep -rn \"${1:pattern}\" ${2:.}"
+    ],
+    "description": "Search recursively with line numbers"
+  },
+  "Follow a file and filter lines": {
+    "prefix": "tailgrep",
+    "body": [
+      "tail -f \"${1:file}\" | grep --line-buffered \"${2:pattern}\""
+    ],
+    "description": "Follow a file and filter lines"
+  },
+  "List listening ports (Linux)": {
+    "prefix": "listenports",
+    "body": [
+      "ss -tulpn"
+    ],
+    "description": "List listening ports (Linux)"
+  },
+  "Processes using the most memory (Linux)": {
+    "prefix": "topmem",
+    "body": [
+      "ps aux --sort=-%mem | head -n ${1:10}"
+    ],
+    "description": "Processes using the most memory (Linux)"
+  },
+  "Current timestamp": {
+    "prefix": "timestamp",
+    "body": [
+      "${1:ts}=\"\\$(date +%Y-%m-%d_%H-%M-%S)\""
+    ],
+    "description": "Current timestamp"
+  },
+  "Create a tar.gz archive": {
+    "prefix": "tarcreate",
+    "body": [
+      "tar -czf \"${1:archive.tar.gz}\" ${2:directory}"
+    ],
+    "description": "Create a tar.gz archive"
+  },
+  "Extract a tar.gz archive": {
+    "prefix": "tarextract",
+    "body": [
+      "tar -xzf \"${1:archive.tar.gz}\" -C \"${2:.}\""
+    ],
+    "description": "Extract a tar.gz archive"
+  },
+  "Run a command on found files": {
+    "prefix": "findxargs",
+    "body": [
+      "find \"${1:.}\" -type f -name \"${2:*.txt}\" -print0 | xargs -0 ${3:wc -l}"
+    ],
+    "description": "Run a command on found files"
+  },
+  "Extract a value from JSON (needs jq)": {
+    "prefix": "jqget",
+    "body": [
+      "jq -r '${1:.key}' \"${2:file.json}\""
+    ],
+    "description": "Extract a value from JSON (needs jq)"
+  }
+}

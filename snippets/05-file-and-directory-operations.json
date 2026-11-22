@@ -1,0 +1,94 @@
+{
+  "Read a whole file into a variable": {
+    "prefix": "readfile",
+    "body": [
+      "${1:content}=\"\\$(< \"${2:file}\")\""
+    ],
+    "description": "Read a whole file into a variable"
+  },
+  "Write text to a file": {
+    "prefix": "writefile",
+    "body": [
+      "printf '%s\\\\n' \"${1:text}\" > \"${2:file}\""
+    ],
+    "description": "Write text to a file"
+  },
+  "Append text to a file": {
+    "prefix": "appendfile",
+    "body": [
+      "printf '%s\\\\n' \"${1:text}\" >> \"${2:file}\""
+    ],
+    "description": "Append text to a file"
+  },
+  "Create a directory (with parents)": {
+    "prefix": "mkdirp",
+    "body": [
+      "mkdir -p \"${1:dir}\""
+    ],
+    "description": "Create a directory (with parents)"
+  },
+  "Temporary file removed on exit": {
+    "prefix": "tmpfile",
+    "body": [
+      "${1:tmp_file}=\"\\$(mktemp)\"",
+      "trap 'rm -f \"\\$${1}\"' EXIT"
+    ],
+    "description": "Temporary file removed on exit"
+  },
+  "Temporary directory removed on exit": {
+    "prefix": "tmpdir",
+    "body": [
+      "${1:tmp_dir}=\"\\$(mktemp -d)\"",
+      "trap 'rm -rf \"\\$${1}\"' EXIT"
+    ],
+    "description": "Temporary directory removed on exit"
+  },
+  "Loop over find results safely": {
+    "prefix": "findloop",
+    "body": [
+      "while IFS= read -r -d '' ${3:file}; do",
+      "\t${4:commands}",
+      "done < <(find \"${1:.}\" -type f -name \"${2:*.log}\" -print0)"
+    ],
+    "description": "Loop over find results safely"
+  },
+  "Back up a file with a timestamp": {
+    "prefix": "backupfile",
+    "body": [
+      "cp -- \"${1:file}\" \"${1}.bak.\\$(date +%Y%m%d_%H%M%S)\""
+    ],
+    "description": "Back up a file with a timestamp"
+  },
+  "Directory of the current script": {
+    "prefix": "scriptdir",
+    "body": [
+      "${1:SCRIPT_DIR}=\"\\$(cd \"\\$(dirname \"\\${BASH_SOURCE[0]\\}\")\" && pwd)\""
+    ],
+    "description": "Directory of the current script"
+  },
+  "Write a here-document to a file (use at the start of a line)": {
+    "prefix": "heredoc",
+    "body": [
+      "cat <<'EOF' > \"${1:file}\"",
+      "${2:content}",
+      "EOF"
+    ],
+    "description": "Write a here-document to a file (use at the start of a line)"
+  },
+  "Rename files by changing the extension": {
+    "prefix": "renamebatch",
+    "body": [
+      "for ${1:file} in *.${2:txt}; do",
+      "\tmv -- \"\\$${1}\" \"\\${${1}%.${2}\\}.${3:md}\"",
+      "done"
+    ],
+    "description": "Rename files by changing the extension"
+  },
+  "Create a symbolic link": {
+    "prefix": "symlink",
+    "body": [
+      "ln -s \"${1:target}\" \"${2:link_name}\""
+    ],
+    "description": "Create a symbolic link"
+  }
+}

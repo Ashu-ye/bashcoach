@@ -1,0 +1,108 @@
+{
+  "Download a file with curl": {
+    "prefix": "curlget",
+    "body": [
+      "curl -fsSL \"${1:https://example.com/file}\" -o \"${2:output_file}\""
+    ],
+    "description": "Download a file with curl"
+  },
+  "POST JSON with curl": {
+    "prefix": "curljson",
+    "body": [
+      "curl -fsS -X POST -H \"Content-Type: application/json\" -d '${1:{\"key\": \"value\"\\}}' \"${2:https://example.com/api}\""
+    ],
+    "description": "POST JSON with curl"
+  },
+  "Get an HTTP status code": {
+    "prefix": "httpstatus",
+    "body": [
+      "${1:status}=\"\\$(curl -s -o /dev/null -w '%{http_code\\}' \"${2:https://example.com}\")\""
+    ],
+    "description": "Get an HTTP status code"
+  },
+  "Check whether a TCP port is open": {
+    "prefix": "checkport",
+    "body": [
+      "if nc -z -w 3 ${1:example.com} ${2:80}; then",
+      "\techo \"Port ${2} is open\"",
+      "else",
+      "\techo \"Port ${2} is closed\" >&2",
+      "fi"
+    ],
+    "description": "Check whether a TCP port is open"
+  },
+  "Check that a host is reachable (Linux)": {
+    "prefix": "pingcheck",
+    "body": [
+      "if ping -c 1 -W 2 ${1:example.com} >/dev/null 2>&1; then",
+      "\techo \"${1} is reachable\"",
+      "else",
+      "\techo \"${1} is unreachable\" >&2",
+      "fi"
+    ],
+    "description": "Check that a host is reachable (Linux)"
+  },
+  "Run a command over SSH": {
+    "prefix": "sshrun",
+    "body": [
+      "ssh -o BatchMode=yes -o ConnectTimeout=${1:5} ${2:user}@${3:host} '${4:command}'"
+    ],
+    "description": "Run a command over SSH"
+  },
+  "Copy a file with scp": {
+    "prefix": "scpfile",
+    "body": [
+      "scp \"${1:file}\" ${2:user}@${3:host}:${4:~/}"
+    ],
+    "description": "Copy a file with scp"
+  },
+  "Generate an ed25519 SSH key": {
+    "prefix": "sshkeygen",
+    "body": [
+      "ssh-keygen -t ed25519 -C \"${1:comment}\" -f \"\\$HOME/.ssh/${2:id_ed25519}\""
+    ],
+    "description": "Generate an ed25519 SSH key"
+  },
+  "Verify a SHA-256 checksum": {
+    "prefix": "sha256check",
+    "body": [
+      "echo \"${1:expected_sha256}  ${2:file}\" | sha256sum -c -"
+    ],
+    "description": "Verify a SHA-256 checksum"
+  },
+  "Generate a random base64 string": {
+    "prefix": "randpass",
+    "body": [
+      "openssl rand -base64 ${1:32}"
+    ],
+    "description": "Generate a random base64 string"
+  },
+  "Show a server certificate's validity dates": {
+    "prefix": "certdates",
+    "body": [
+      "echo | openssl s_client -connect ${1:example.com}:${2:443} -servername ${1} 2>/dev/null | openssl x509 -noout -dates"
+    ],
+    "description": "Show a server certificate's validity dates"
+  },
+  "Resolve a hostname": {
+    "prefix": "resolvehost",
+    "body": [
+      "getent hosts \"${1:example.com}\""
+    ],
+    "description": "Resolve a hostname"
+  },
+  "Make a file private (600)": {
+    "prefix": "chmod600",
+    "body": [
+      "chmod 600 \"${1:file}\""
+    ],
+    "description": "Make a file private (600)"
+  },
+  "Restrictive umask (077)": {
+    "prefix": "umasksafe",
+    "body": [
+      "umask 077"
+    ],
+    "description": "Restrictive umask (077)"
+  }
+}
